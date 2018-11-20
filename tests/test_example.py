@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import sys
 sys.path.append('..')
-
+sys.path.append('../IO/')
 from EPF import Structure, StructureDifference
 class TestEPF(unittest.TestCase):
     
@@ -42,11 +42,11 @@ class TestEPF(unittest.TestCase):
         SD = StructureDifference(S1,S2)
         diff,corresp = SD.get_structure_difference()
         self.assertAlmostEqual(diff, 0.7607215670542145)
-        
+
+
     def test_graphene(self):
-        from sagar.io.vasp import read_vasp
-        c = read_vasp('primitive_cell.vasp')
-        S = Structure(c.lattice,c.positions,c.atoms)
+        from vasp import read_vasp
+        S = read_vasp('primitive_cell.vasp')
         equal_atoms = np.unique(S.get_equivalent_atoms())
         self.assertEqual(len(equal_atoms),1)
         

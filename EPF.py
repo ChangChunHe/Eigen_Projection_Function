@@ -12,9 +12,9 @@ from matplotlib import pyplot as plt
 
 class Structure:
     def __init__(self, lattice, positions, atoms, Rcut=5, iscluster=False):
-        self._lattice = lattice
+        self._lattice = np.array(lattice).reshape((3,3))
         self._atoms = atoms
-        self._positions = positions
+        self._positions = np.array(positions).reshape((-1,3))
         self._Rcut = Rcut
         self._iscluster = iscluster
 

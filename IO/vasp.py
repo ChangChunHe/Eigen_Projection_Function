@@ -101,13 +101,12 @@ def _read_string(data):
         coortype = lines[line_coortype].split()[0]
 
     if coortype[0] in "cCkK":
+        line_first_pos = line_coortype + 1
         iscart=True
     else:
         iscart =False
-
     if coortype[0] in "dD":
         line_first_pos = line_coortype + 1
-
     positions = []
     total_atoms = sum(numofatoms)
     for i in range(line_first_pos, line_first_pos + total_atoms):
@@ -119,7 +118,9 @@ def _read_string(data):
     newatoms = [symbol2number(i) for i in atoms]
     return Structure(lattice,positions,newatoms)
 
-
+if __name__ == "__main__":
+    filename = '../tests/primitive_cell_cart.vasp'
+    s = read_vasp(filename)
 #def write_vasp(cell, filename='POSCAR', suffix='.vasp', long_format=True):
 #    """
 #    write vasp POSCAR type into file, vasp5 format only.

@@ -7,6 +7,7 @@ Created on Mon Nov 19 20:39:14 2018
 """
 import unittest
 import numpy as np
+from vasp import read_vasp
 import sys
 sys.path.append('..')
 sys.path.append('../IO/')
@@ -19,13 +20,24 @@ class TestEPF(unittest.TestCase):
         self.positions1 = np.array([[0.5,0.5,0.5], [0,1,0],[1,0,0],[1,1,1],[0,0,1]])
         self.positions2 = np.array([[0.7,0.7,0.7], [0,1,0],[1,0,0],[1,1,1],[0,0,1]])
     
-    
+    def test_cart(self):
+        S = read_vasp('primitive_cell_cart.vasp')
+        S.draw_EPA()
+        
+    def test_direct(self):
+        S = read_vasp('primitive_cell_direct.vasp')
+        S.draw_EPA()
+        
     def test_CH4(self):
         positions = self.positions1 * 1.09 *2/np.sqrt(3)
         S = Structure(self.lattice,positions,self.atoms,iscluster=True)
         equal_atoms = np.unique(S.get_equivalent_atoms())
         self.assertEqual(len(equal_atoms),2)
-        
+    
+    def test_draw_EPF(self):
+        from vasp import read_vasp
+        S = read_vasp('primitive_cell_cart.vasp')
+        S.draw_EPA()
         
     def test_CHH3(self):
         positions = self.positions2 * 1.09 * 2/np.sqrt(3)
@@ -45,8 +57,7 @@ class TestEPF(unittest.TestCase):
 
 
     def test_graphene(self):
-        from vasp import read_vasp
-        S = read_vasp('primitive_cell.vasp')
+        S = read_vasp('primitive_cell_cart.vasp')
         equal_atoms = np.unique(S.get_equivalent_atoms())
         self.assertEqual(len(equal_atoms),1)
         

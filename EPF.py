@@ -8,8 +8,8 @@ from scipy.optimize import linear_sum_assignment
 from matplotlib import pyplot as plt
 
 class Structure:
-    
-    
+
+
     def __init__(self, lattice, positions, atoms, iscluster=False):
         self.lattice = np.array(lattice).reshape((3,3))
         self.atoms = atoms
@@ -18,7 +18,7 @@ class Structure:
         self.atomsnumber = np.shape(self.positions)[0]
 
 
-    def get_extend_distance_matrix(self):
+    def get_extend_min_distance_matrix(self):
         n = self.atomsnumber
         if self.iscluster:
             positions = np.dot(self.positions, self.lattice)
@@ -42,7 +42,7 @@ class Structure:
     def get_decrease_distance_matrix(self,Rcut=5):
         dec_func = lambda x: (1-x/(Rcut))**4 if x <= Rcut else 0
         if  self.iscluster:
-            d = self.get_extend_distance_matrix()
+            d = self.get_extend_min_distance_matrix()
             all_atom_d = []
             for ii in range(self.atomsnumber):
                 q = np.where(d[ii]<Rcut)[0]
@@ -84,7 +84,7 @@ class Structure:
 
 
     def get_structure_eig(self):
-        return ftk.get_EPA(self.get_extend_distance_matrix())
+        return ftk.get_EPA(self.get_extend_min_distance_matrix())
 
 
     def getatoms_EPF(self):

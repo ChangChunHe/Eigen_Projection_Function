@@ -136,7 +136,7 @@ class Structure:
 class StructureDifference:
 
 
-    def __init__(self, structure1,structure2):
+    def __init__(self, structure1, structure2):
         self._structure1 = structure1
         self._structure2 = structure2
 

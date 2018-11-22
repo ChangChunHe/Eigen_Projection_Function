@@ -7,10 +7,10 @@ Created on Mon Nov 19 20:39:14 2018
 """
 import unittest
 import numpy as np
-from vasp import read_vasp
 import sys
 sys.path.append('..')
-sys.path.append('../IO/')
+sys.path.append('../IO')
+from vasp import read_vasp
 from EPF import Structure, StructureDifference
 class TestEPF(unittest.TestCase):
     
@@ -31,7 +31,7 @@ class TestEPF(unittest.TestCase):
     def test_CH4(self):
         positions = self.positions1 * 1.09 *2/np.sqrt(3)
         S = Structure(self.lattice,positions,self.atoms,iscluster=True)
-        equal_atoms = np.unique(S.get_equivalent_atoms())
+        equal_atoms = np.unique(S.get_equivalentatoms())
         self.assertEqual(len(equal_atoms),2)
     
     def test_draw_EPF(self):
@@ -42,7 +42,7 @@ class TestEPF(unittest.TestCase):
     def test_CHH3(self):
         positions = self.positions2 * 1.09 * 2/np.sqrt(3)
         S = Structure(self.lattice,positions,self.atoms,iscluster=True)
-        equal_atoms = np.unique(S.get_equivalent_atoms())
+        equal_atoms = np.unique(S.get_equivalentatoms())
         self.assertEqual(len(equal_atoms),3)
         
         
@@ -58,7 +58,7 @@ class TestEPF(unittest.TestCase):
 
     def test_graphene(self):
         S = read_vasp('primitive_cell_cart.vasp')
-        equal_atoms = np.unique(S.get_equivalent_atoms())
+        equal_atoms = np.unique(S.get_equivalentatoms())
         self.assertEqual(len(equal_atoms),1)
         
         

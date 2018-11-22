@@ -14,7 +14,7 @@ import warnings
 import sys
 sys.path.append('..')
 
-from EPF import Structure
+from structure import Structure
 from function_toolkit import symbol2number
 
 

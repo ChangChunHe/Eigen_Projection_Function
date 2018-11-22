@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Nov 18 15:45:23 2018
 
-@author: hecc
-"""
+
 import numpy as np
 import function_toolkit as ftk
 import hungarian
@@ -12,38 +9,38 @@ from matplotlib import pyplot as plt
 
 class Structure:
     def __init__(self, lattice, positions, atoms, Rcut=5, iscluster=False):
-        self._lattice = np.array(lattice).reshape((3,3))
-        self._atoms = atoms
-        self._positions = np.array(positions).reshape((-1,3))
-        self._Rcut = Rcut
-        self._iscluster = iscluster
+        self.lattice = np.array(lattice).reshape((3,3))
+        self.atoms = atoms
+        self.positions = np.array(positions).reshape((-1,3))
+        self.Rcut = Rcut
+        self.iscluster = iscluster
 
 
     def get_extend_distance_matrix(self):
-        n = np.shape(self._positions)[0]
-        if self._iscluster:
-            positions = np.dot(self._positions, self._lattice)
+        n = np.shape(self.positions)[0]
+        if self.iscluster:
+            positions = np.dot(self.positions, self.lattice)
             d = np.zeros((n,n))
             for ii in range(n):
                 for jj in range(ii+1,n):
                     d[ii,jj] = np.linalg.norm(positions[ii]-positions[jj])
         else:
-            self._lattice, self._positions = ftk.get_reduced_cell(self._lattice, self._positions)
-            positions = np.dot(self._positions, self._lattice)     
+            self.lattice, self.positions = ftk.get_reduced_cell(self.lattice, self.positions)
+            positions = np.dot(self.positions, self.lattice)     
             all_basis = ftk.generate_all_basis(1,1,1)
             d = np.zeros((n,n))
             for ii in range(n-1):
                 dd = []
                 for basis in all_basis:
-                    tmp_pos = positions + np.sum(np.dot(np.diag(basis),self._lattice),axis=0)
+                    tmp_pos = positions + np.sum(np.dot(np.diag(basis),self.lattice),axis=0)
                     dd.append(np.linalg.norm(positions[ii]-tmp_pos[ii+1:],axis=1))
                 dd = np.array(dd).transpose()
                 d[ii,ii+1:] = np.min(dd,axis=1)
-        return d + d.T + np.diag(self._atoms)
+        return d + d.T + np.diag(self.atoms)
 
 
     def get_decrease_distance_matrix(self):
-        if not self._iscluster:
+        if not self.iscluster:
             pass
         else:
             pass
@@ -53,9 +50,9 @@ class Structure:
         return ftk.get_EPA(self.get_extend_distance_matrix())
 
 
-    def get_atoms_EPF(self):
+    def getatoms_EPF(self):
         eigval,eigvec = self.get_structure_eig()
-        n = np.shape(self._positions)[0]
+        n = np.shape(self.positions)[0]
         d = np.zeros((n,n))
         for ii in range(n):
             for jj in range(ii+1,n):
@@ -63,9 +60,9 @@ class Structure:
         return d + d.T
 
 
-    def get_equivalent_atoms(self,eps=1e-4):
-        d = self.get_atoms_EPF()
-        n = np.shape(self._positions)[0]
+    def get_equivalentatoms(self,eps=1e-4):
+        d = self.getatoms_EPF()
+        n = np.shape(self.positions)[0]
         equal_atom = np.arange(n)
         for ii in range(n):
             ind = np.where(d[ii]<eps)[0]
@@ -77,7 +74,7 @@ class Structure:
         eigval,eigvec = self.get_structure_eig()
         num_eigval = np.size(eigval)
         if isunique:
-            equal_atom = np.unique(self.get_equivalent_atoms())
+            equal_atom = np.unique(self.get_equivalentatoms())
             for atom in equal_atom:
                 tmp_eigvec = eigvec[atom]
                 line = [[0,eigval[0]]]
@@ -86,7 +83,7 @@ class Structure:
                     line.append([sum(tmp_eigvec[:ii+1]),eigval[ii+1]])
                 line.append([1,eigval[-1]])
                 line = np.array(line)
-                plt.plot(line[:,0],line[:,1],label=self._atoms[atom])
+                plt.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom]))
             plt.legend()
             plt.show()
         else:
@@ -95,13 +92,14 @@ class Structure:
 
     def get_eig_spetra(self):
         pass
-    
+
+
 class StructureDifference:
     
     def __init__(self, structure1,structure2,Rcut=5):
         self._structure1 = structure1
         self._structure2 = structure2
-        self._Rcut=  Rcut
+        self.Rcut=  Rcut
 
     def get_structure_difference(self):
         eigval1,eigvec1 = self._structure1.get_structure_eig()

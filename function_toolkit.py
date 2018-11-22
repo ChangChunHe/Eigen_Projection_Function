@@ -6,7 +6,7 @@ Created on Sun Nov 18 19:36:57 2018
 @author: hecc
 """
 import numpy as np
-from pyniggli import reduced_cell
+from niggli import reduced_cell
 
 def get_EPA(d):
     n = np.shape(d)[0]

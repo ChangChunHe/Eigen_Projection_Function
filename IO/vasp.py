@@ -18,7 +18,7 @@ from EPF import Structure
 from function_toolkit import symbol2number
 
 
-def read_vasp(filename='POSCAR'):
+def read_vasp(filename='POSCAR',iscluster=False):
     """
     Import POSCAR/CONTCAR or filename with .vasp suffix
 
@@ -30,10 +30,10 @@ def read_vasp(filename='POSCAR'):
     # TODO: read velocities, now not supported. or not needed?
     with open(filename, "r") as f:
         # _read_string return Cell object.
-        return _read_string(f.read())
+        return _read_string(f.read(),iscluster)
 
 
-def _read_string(data):
+def _read_string(data,iscluster):
     """
     _read_string make io easy to be tested.
 
@@ -116,7 +116,7 @@ def _read_string(data):
     if iscart:
         positions = numpy.dot(numpy.array(positions),numpy.linalg.inv(lattice))
     newatoms = [symbol2number(i) for i in atoms]
-    return Structure(lattice,positions,newatoms)
+    return Structure(lattice,positions,newatoms,iscluster=iscluster)
 
 if __name__ == "__main__":
     filename = '../tests/primitive_cell_cart.vasp'

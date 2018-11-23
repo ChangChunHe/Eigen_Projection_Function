@@ -1,21 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 20 13:13:46 2018
 
-@author: hecc
-"""
-
-# -*- coding: utf-8 -*-
 import numpy
 import warnings
-#import operator
-#import collections
-import sys
-sys.path.append('..')
 
-from structure import Structure
-from function_toolkit import symbol2number
+
+from eigprofuc.structure import Structure
+from eigprofuc.function_toolkit import symbol2number
 
 
 def read_vasp(filename='POSCAR',iscluster=False):

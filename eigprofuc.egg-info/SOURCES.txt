@@ -1,9 +1,0 @@
-eigprofuc/__init__.py
-eigprofuc/function_toolkit.py
-eigprofuc/niggli.py
-eigprofuc/structure.py
-eigprofuc.egg-info/PKG-INFO
-eigprofuc.egg-info/SOURCES.txt
-eigprofuc.egg-info/dependency_links.txt
-eigprofuc.egg-info/requires.txt
-eigprofuc.egg-info/top_level.txt

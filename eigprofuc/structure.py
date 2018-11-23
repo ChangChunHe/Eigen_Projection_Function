@@ -3,7 +3,7 @@
 
 
 import numpy as np
-import function_toolkit as ftk
+import eigprofuc.function_toolkit as ftk
 from scipy.optimize import linear_sum_assignment
 from matplotlib import pyplot as plt
 

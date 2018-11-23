@@ -3,11 +3,9 @@
 
 import unittest
 import numpy as np
-import sys
-sys.path.append('..')
-sys.path.append('../IO')
-from vasp import read_vasp
-from structure import Structure, StructureDifference
+
+from eigprofuc.IO.vasp import read_vasp
+from eigprofuc.structure import Structure, StructureDifference
 
 
 class TestEPF(unittest.TestCase):
@@ -39,7 +37,6 @@ class TestEPF(unittest.TestCase):
 
 
     def test_draw_EPF(self):
-        from vasp import read_vasp
         S = read_vasp('primitive_cell_cart.vasp')
         S.draw_EPA()
 

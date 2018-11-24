@@ -19,6 +19,6 @@ setup(name = "eigprofuc",
     #put them into the package directory - they will be found
     #recursively.)
     packages = ['eigprofuc'],
-    install_requires=['numpy','scipy','matplotlib']
+    install_requires=['numpy>=1.15.4','scipy>=1.1.0','matplotlib>=2.2.2']
 
 )

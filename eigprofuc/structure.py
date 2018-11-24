@@ -39,7 +39,7 @@ class Structure:
         return d + np.diag(self.atoms)
 
 
-    def get_decrease_distance_matrix(self,Rcut=5):
+    def get_decrease_distance_matrix(self,Rcut=5, ispar=False):
         dec_func = lambda x: (1-x/(Rcut))**4 if x <= Rcut else 0
         if  self.iscluster:
             d = self.get_extend_min_distance_matrix()
@@ -54,7 +54,6 @@ class Structure:
                         tmp_d[jj+1,kk+1] = dec_func(d[q[jj],q[kk]])
                 diag_atom = [self.atoms[ii]] + [self.atoms[i] for i in q]
                 all_atom_d.append(tmp_d + tmp_d.T +np.diag(diag_atom))
-
         else:
             lattice, positions = ftk.get_reduced_cell(self.lattice, self.positions)
             cart_pos = np.dot(positions,lattice)
@@ -64,10 +63,8 @@ class Structure:
             d0,d1,d2 = np.abs(np.dot(a,n0)),np.abs(np.dot(b,n1)),np.abs(np.dot(c,n2))
             N0,N1,N2 = int(np.ceil((Rcut+0.000001)/d0)),int(np.ceil((Rcut+0.000001)/d1)),int(np.ceil((Rcut+0.000001)/d2))
             all_basis = ftk.generate_all_basis(N0,N1,N2)
-
             all_atom_pos = [cart_pos + np.sum(np.dot(np.diag(basis),lattice),axis=0) for basis in all_basis]
             all_atom_pos = np.array(all_atom_pos).reshape((-1,3))
-
             all_atom_d = []
             for ii in range(self.atomsnumber):# for all atoms
                 tmp_d = np.linalg.norm(cart_pos[ii]-all_atom_pos,axis=1)
@@ -104,7 +101,7 @@ class Structure:
         for ii in range(n):
             ind = np.where(d[ii]<eps)[0]
             equal_atom[ind] = ii
-        return equal_atom
+        return [(ii,jj) for ii,jj in enumerate(equal_atom)]
 
 
     def draw_EPA(self,isunique=True):
@@ -127,9 +124,16 @@ class Structure:
             pass
 
 
-    def get_eig_spetra(self):
-        pass
-
+    def draw_eig_spectra(self,atom_seq,sigma=0.1):
+        # Lorentz expansion
+        eigval,eigvec = self.get_structure_eig()
+        min_eigval,max_eigval = 0, max(self.atoms)+1
+        for i in atom_seq:
+            f = lambda la: sum([eigvec[i,ii]*sigma/((la-eigval[ii])**2+sigma**2) for ii in range(np.shape(eigval)[0])])
+            eigspec = [f(ii) for ii in np.arange(min_eigval,max_eigval,0.1)]
+            plt.plot(np.arange(min_eigval,max_eigval,0.1), np.array(eigspec)+i,label=str(i),color='b')
+        plt.legend()
+        plt.show()
 
 
 
@@ -172,3 +176,16 @@ class StructureDifference:
         row_ind, col_ind = linear_sum_assignment(d)
         corresponding_sequence = np.array(list(zip(row_ind,col_ind)))
         return d[row_ind, col_ind].sum(),corresponding_sequence[np.argsort(corresponding_sequence[:,0])]
+
+if __name__ == "__main__":
+    from eigprofuc.IO.vasp import read_vasp
+    s = read_vasp('tests/POSCAR119.vasp',iscluster=True)
+    eigval,eigvec = s.get_structure_eig()
+    atom = s.get_equivalent_atoms()
+    s.draw_eig_spectra(atom_seq=[0,1,2,3,4])
+    
+    
+    
+    
+    
+    

@@ -32,21 +32,23 @@ class TestEPF(unittest.TestCase):
     def test_CH4(self):
         positions = self.positions1 * 1.09 *2/np.sqrt(3)
         S = Structure(self.lattice,positions,self.atoms,iscluster=True)
-        equal_atoms = np.unique(S.get_equivalent_atoms())
-        self.assertEqual(len(equal_atoms),2)
+        self.assertEqual(len(S.get_equivalent_atoms()),2)
 
 
     def test_draw_EPF(self):
-        S = read_vasp('primitive_cell_cart.vasp')
+        positions = self.positions2 * 1.09 * 2/np.sqrt(3)
+        S = Structure(self.lattice,positions,self.atoms,iscluster=True)
         S.draw_EPA()
-
+        
+        
+    def test_eigen_spectral(self):
+        S = read_vasp('POSCAR_BN_12.vasp')
+        S.draw_eig_spectra(atom_seq=range(12))
 
     def test_CHH3(self):
         positions = self.positions2 * 1.09 * 2/np.sqrt(3)
         S = Structure(self.lattice,positions,self.atoms,iscluster=True)
-        equal_atoms = np.unique(S.get_equivalent_atoms())
-        S.draw_EPA()
-        self.assertEqual(len(equal_atoms),3)
+        self.assertEqual(len(S.get_equivalent_atoms()),3)
 
 
     def test_StructureDifference(self):
@@ -61,9 +63,8 @@ class TestEPF(unittest.TestCase):
 
     def test_graphene(self):
         S = read_vasp('primitive_cell_cart.vasp')
-        equal_atoms = np.unique(S.get_equivalent_atoms())
-        self.assertEqual(len(equal_atoms),1)
-
+        self.assertEqual(len(S.get_equivalent_atoms()),1)
+        
 
     def test_decrease_difference_cluster(self):
         S1,S2 = read_vasp('POSCAR1',iscluster=True),read_vasp('POSCAR2',iscluster=True)
@@ -73,11 +74,12 @@ class TestEPF(unittest.TestCase):
 
 
     def test_decrease_difference_periodic(self):
-        S1 = read_vasp('POSCAR-1')
-        S2 = read_vasp('POSCAR-2')
+        S1 = read_vasp('POSCAR_BN_2')
+        S2 = read_vasp('POSCAR_BN_12.vasp')
         SD = StructureDifference(S1,S2)
         A,B = SD.get_structure_decdistance_diff(Rcut=2)
-        self.assertEqual(np.shape(B)[0],12)
+        self.assertLessEqual(A,1e-4)
+        
 
 
 if __name__ == "__main__":

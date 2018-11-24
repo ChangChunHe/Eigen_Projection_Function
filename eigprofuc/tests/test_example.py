@@ -4,7 +4,7 @@
 import unittest
 import numpy as np
 
-from eigprofuc.IO.vasp import read_vasp
+from eigprofuc.io.vasp import read_vasp
 from eigprofuc.structure import Structure, StructureDifference
 
 

@@ -113,6 +113,7 @@ class Structure:
         num_eigval = np.size(eigval)
         if isunique:
             equal_atom = self.get_equivalent_atoms()
+            plt.subplot(111)
             for idx, atom in equal_atom.items():
                 tmp_eigvec = np.squeeze(eigvec[atom[0]])
                 line = [[0,eigval[0]]]
@@ -123,7 +124,8 @@ class Structure:
                 line = np.array(line)
                 plt.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom[0]]))
             plt.legend()
-            plt.show()
+            plt.savefig('EPA.png')
+            plt.close()
         else:
             pass
 
@@ -132,12 +134,14 @@ class Structure:
         # Lorentz expansion
         eigval,eigvec = self.get_structure_eig()
         min_eigval,max_eigval = 0, max(self.atoms)+1
+        plt.subplot(111)
         for i in atom_seq:
             f = lambda la: sum([eigvec[i,ii]*sigma/((la-eigval[ii])**2+sigma**2) for ii in range(np.shape(eigval)[0])])
             eigspec = [f(ii) for ii in np.arange(min_eigval,max_eigval,0.1)]
             plt.plot(np.arange(min_eigval,max_eigval,0.1), np.array(eigspec)+i,label=str(i),color='b')
         plt.legend()
-        plt.show()
+        plt.savefig('eig_spectra.png')
+        plt.close()
 
 
 

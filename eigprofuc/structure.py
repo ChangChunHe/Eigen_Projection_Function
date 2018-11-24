@@ -106,41 +106,43 @@ class Structure:
         for ii, jj in enumerate(_equal_atom):
             equal_atom_set[ii] = np.where(equal_atom==jj)[0]
         return equal_atom_set
-    
 
-    def draw_EPA(self,isunique=True):
+
+    def draw_EPA(self,eps=1e-4):
         eigval,eigvec = self.get_structure_eig()
         num_eigval = np.size(eigval)
-        if isunique:
-            equal_atom = self.get_equivalent_atoms()
-            plt.subplot(111)
-            for idx, atom in equal_atom.items():
-                tmp_eigvec = np.squeeze(eigvec[atom[0]])
-                line = [[0,eigval[0]]]
-                for ii in range(num_eigval-1):
-                    line.append([sum(tmp_eigvec[:ii+1]),eigval[ii]])
-                    line.append([sum(tmp_eigvec[:ii+1]),eigval[ii+1]])
-                line.append([1,eigval[-1]])
-                line = np.array(line)
-                plt.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom[0]]))
-            plt.legend()
-            plt.savefig('EPA.png')
-            plt.close()
-        else:
-            pass
+        equal_atom = self.get_equivalent_atoms(eps)
+        ax = plt.subplot(111)
+        for idx, atom in equal_atom.items():
+            tmp_eigvec = np.squeeze(eigvec[atom[0]])
+            line = [[0,eigval[0]]]
+            for ii in range(num_eigval-1):
+                line.append([sum(tmp_eigvec[:ii+1]),eigval[ii]])
+                line.append([sum(tmp_eigvec[:ii+1]),eigval[ii+1]])
+            line.append([1,eigval[-1]])
+            line = np.array(line)
+            ax.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom[0]]))
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.show()
+        plt.close()
+
 
 
     def draw_eig_spectra(self,atom_seq,sigma=0.1):
         # Lorentz expansion
         eigval,eigvec = self.get_structure_eig()
         min_eigval,max_eigval = 0, max(self.atoms)+1
-        plt.subplot(111)
+        ax = plt.subplot(111)
         for i in atom_seq:
             f = lambda la: sum([eigvec[i,ii]*sigma/((la-eigval[ii])**2+sigma**2) for ii in range(np.shape(eigval)[0])])
             eigspec = [f(ii) for ii in np.arange(min_eigval,max_eigval,0.1)]
-            plt.plot(np.arange(min_eigval,max_eigval,0.1), np.array(eigspec)+i,label=str(i),color='b')
-        plt.legend()
-        plt.savefig('eig_spectra.png')
+            ax.plot(np.arange(min_eigval,max_eigval,0.1), np.array(eigspec)+2*i,label=str(i),color='b')
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.show()
         plt.close()
 
 

@@ -101,23 +101,27 @@ class Structure:
         for ii in range(n):
             ind = np.where(d[ii]<eps)[0]
             equal_atom[ind] = ii
-        return [(ii,jj) for ii,jj in enumerate(equal_atom)]
-
+        _equal_atom = np.unique(equal_atom)
+        equal_atom_set = dict()
+        for ii, jj in enumerate(_equal_atom):
+            equal_atom_set[ii] = np.where(equal_atom==jj)[0]
+        return equal_atom_set
+    
 
     def draw_EPA(self,isunique=True):
         eigval,eigvec = self.get_structure_eig()
         num_eigval = np.size(eigval)
         if isunique:
-            equal_atom = np.unique(self.get_equivalent_atoms())
-            for atom in equal_atom:
-                tmp_eigvec = eigvec[atom]
+            equal_atom = self.get_equivalent_atoms()
+            for idx, atom in equal_atom.items():
+                tmp_eigvec = np.squeeze(eigvec[atom[0]])
                 line = [[0,eigval[0]]]
                 for ii in range(num_eigval-1):
                     line.append([sum(tmp_eigvec[:ii+1]),eigval[ii]])
                     line.append([sum(tmp_eigvec[:ii+1]),eigval[ii+1]])
                 line.append([1,eigval[-1]])
                 line = np.array(line)
-                plt.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom]))
+                plt.plot(line[:,0],line[:,1],label=ftk.get_symbol(self.atoms[atom[0]]))
             plt.legend()
             plt.show()
         else:
@@ -176,16 +180,3 @@ class StructureDifference:
         row_ind, col_ind = linear_sum_assignment(d)
         corresponding_sequence = np.array(list(zip(row_ind,col_ind)))
         return d[row_ind, col_ind].sum(),corresponding_sequence[np.argsort(corresponding_sequence[:,0])]
-
-if __name__ == "__main__":
-    from eigprofuc.IO.vasp import read_vasp
-    s = read_vasp('tests/POSCAR119.vasp',iscluster=True)
-    eigval,eigvec = s.get_structure_eig()
-    atom = s.get_equivalent_atoms()
-    s.draw_eig_spectra(atom_seq=[0,1,2,3,4])
-    
-    
-    
-    
-    
-    

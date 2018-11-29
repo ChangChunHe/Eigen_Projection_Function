@@ -84,7 +84,7 @@ class Structure:
         return ftk.get_EPA(self.get_extend_min_distance_matrix())
 
 
-    def getatoms_EPF(self):
+    def get_atomsdistance_mindistance(self):
         eigval,eigvec = self.get_structure_eig()
         n = np.shape(self.positions)[0]
         d = np.zeros((n,n))
@@ -92,10 +92,35 @@ class Structure:
             for jj in range(ii+1,n):
                 d[ii,jj] = ftk.d_EPF_atom(eigval,eigval, eigvec[ii],eigvec[jj])
         return d + d.T
+    
+    def get_atomsdistance_decdistance(self):
+        all_atom_d = self.get_decrease_distance_matrix()
+        eigval_list,eigvec_list = [],[]
+        for ii in all_atom_d:
+            eigval,eigvec = ftk.get_EPA(ii)
+            eigval_list.append(eigval)
+            eigvec_list.append(eigvec)
+        n = np.shape(self.positions)[0]
+        d = np.zeros((n,n))
+        for ii in range(n):
+            for jj in range(ii+1,n):
+                eigval_1,eigval_2 = eigval_list[ii],eigval_list[jj]
+                eigvec_1,eigvec_2 = eigvec_list[ii],eigvec_list[jj]
+                tmp_d = []
+                for I in range(np.size(eigval_1)):
+                    for J in range(np.size(eigval_2)):
+                        tmp_d.append(ftk.d_EPF_atom(eigval_1,
+                                                    eigval_2, 
+                                                    eigvec_1[I],eigvec_2[J]))
+                tmp_d = np.reshape(tmp_d,(np.size(eigval_1),np.size(eigval_2)))
+                row_ind, col_ind = linear_sum_assignment(tmp_d)
+                d[ii,jj] = tmp_d[row_ind, col_ind].sum()
+        return d + d.T
 
 
     def get_equivalent_atoms(self,eps=1e-4):
-        d = self.getatoms_EPF()
+        # only support minum distance matrix
+        d = self.get_atomsdistance_mindistance()
         n = np.shape(self.positions)[0]
         equal_atom = np.arange(n)
         for ii in range(n):
@@ -186,3 +211,9 @@ class StructureDifference:
         row_ind, col_ind = linear_sum_assignment(d)
         corresponding_sequence = np.array(list(zip(row_ind,col_ind)))
         return d[row_ind, col_ind].sum(),corresponding_sequence[np.argsort(corresponding_sequence[:,0])]
+
+if __name__ == "__main__":
+    from eigprofuc.io.vasp import read_vasp
+    s = read_vasp('/home/hecc/Desktop/test_eigen_proj_fun/POSCAR14.vasp')
+    d = s.get_atomsdistance_decdistance()
+    

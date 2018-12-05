@@ -91,6 +91,14 @@ def get_dis_mat(positions):
 
 
 
+def get_tmp_d(eigval_1,eigvec_1,eigval_2,eigvec_2):
+    tmp_d = []
+    for I in range(np.size(eigval_1)):
+        for J in range(np.size(eigval_2)):
+            tmp_d.append(d_EPF_atom(eigval_1,eigval_2, eigvec_1[I],eigvec_2[J]))
+    return tmp_d
+
+
 periodic_table_dict = {'Vacc': 0,
                        'H': 1, 'He': 2,'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10,
                        'Na': 11, 'Mg': 12, 'Al': 13, 'Si': 14, 'P': 15, 'S': 16, 'Cl': 17, 'Ar': 18,

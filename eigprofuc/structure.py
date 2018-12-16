@@ -92,31 +92,27 @@ class Structure:
             for jj in range(ii+1,n):
                 d[ii,jj] = ftk.d_EPF_atom(eigval,eigval, eigvec[ii],eigvec[jj])
         return d + d.T
-    
-    def get_atomsdistance_decdistance(self):
-        all_atom_d = self.get_decrease_distance_matrix()
-        eigval_list,eigvec_list = [],[]
-        for ii in all_atom_d:
-            eigval,eigvec = ftk.get_EPA(ii)
-            eigval_list.append(eigval)
-            eigvec_list.append(eigvec)
-        n = np.shape(self.positions)[0]
-        d = np.zeros((n,n))
-        for ii in range(n):
-            for jj in range(ii+1,n):
-                eigval_1,eigval_2 = eigval_list[ii],eigval_list[jj]
-                eigvec_1,eigvec_2 = eigvec_list[ii],eigvec_list[jj]
-                tmp_d = []
-                for I in range(np.size(eigval_1)):
-                    for J in range(np.size(eigval_2)):
-                        tmp_d.append(ftk.d_EPF_atom(eigval_1,
-                                                    eigval_2, 
-                                                    eigvec_1[I],eigvec_2[J]))
-                tmp_d = np.reshape(tmp_d,(np.size(eigval_1),np.size(eigval_2)))
-                row_ind, col_ind = linear_sum_assignment(tmp_d)
-                d[ii,jj] = tmp_d[row_ind, col_ind].sum()
-        return d + d.T
 
+
+    def get_atomsdistance_decdistance(self,Rcut=5,isparallel=False):
+            all_atom_d = self.get_decrease_distance_matrix(Rcut=Rcut)
+            eigval_list,eigvec_list = [],[]
+            for ii in all_atom_d:
+                eigval,eigvec = ftk.get_EPA(ii)
+                eigval_list.append(eigval)
+                eigvec_list.append(eigvec)
+            n = np.shape(self.positions)[0]
+            d = np.zeros((n,n))
+            if not isparallel:
+                for ii in range(n):
+                    d[ii,ii+1:] = ftk.get_d_rows(eigval_list,eigvec_list,ii,n)
+            elif isparallel:
+                from multiprocessing import Pool, cpu_count
+                p = Pool(cpu_count())
+                for ii in range(n):
+                    res = p.apply_async(ftk.get_d_rows, (eigval_list,eigvec_list,ii,n))
+                    d[ii,ii+1:] = res.get()
+            return d + d.T
 
     def get_equivalent_atoms(self,eps=1e-4):
         # only support minum distance matrix
@@ -152,7 +148,6 @@ class Structure:
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.show()
         plt.close()
-
 
 
     def draw_eig_spectra(self,atom_seq,sigma=0.1):
@@ -214,6 +209,9 @@ class StructureDifference:
 
 if __name__ == "__main__":
     from eigprofuc.io.vasp import read_vasp
-    s = read_vasp('/home/hecc/Desktop/test_eigen_proj_fun/POSCAR14.vasp')
-    d = s.get_atomsdistance_decdistance()
-    
+    s = read_vasp('/home/hecc/Desktop/POSCAR14.vasp')
+    import time
+    a = time.time()
+    for i in range(10):
+        d1 = s.get_atomsdistance_decdistance(Rcut=3,isparallel=True)
+    print(time.time()-a)

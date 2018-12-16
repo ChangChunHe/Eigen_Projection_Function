@@ -7,6 +7,7 @@ Created on Sun Nov 18 19:36:57 2018
 """
 import numpy as np
 from eigprofuc.niggli import reduced_cell
+from scipy.optimize import linear_sum_assignment
 
 def get_EPA(d):
     n = np.shape(d)[0]
@@ -98,6 +99,19 @@ def get_tmp_d(eigval_1,eigvec_1,eigval_2,eigvec_2):
             tmp_d.append(d_EPF_atom(eigval_1,eigval_2, eigvec_1[I],eigvec_2[J]))
     return tmp_d
 
+
+def get_d_rows(eigval_list,eigvec_list,ii,n):
+    d = []
+    for jj in range(ii+1,n):
+        eigval_1,eigval_2 = eigval_list[ii],eigval_list[jj]
+        eigvec_1,eigvec_2 = eigvec_list[ii],eigvec_list[jj]
+        tmp_d = get_tmp_d(eigval_1,eigvec_1,eigval_2,eigvec_2)
+        tmp_d = np.reshape(tmp_d,(np.size(eigval_1),np.size(eigval_2)))
+        row_ind, col_ind = linear_sum_assignment(tmp_d)
+        d.append(tmp_d[row_ind, col_ind].sum())
+    return np.array(d)
+            
+    
 
 periodic_table_dict = {'Vacc': 0,
                        'H': 1, 'He': 2,'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'Ne': 10,

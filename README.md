@@ -12,3 +12,5 @@ You can install this package through `pip`:
 `pip install -e . `
 
 for developers.
+
+I hope you can new a python3 environment via `virtualenv` or other ways, so that there will not appears some incompatible problems

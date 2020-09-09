@@ -3,7 +3,7 @@
 
 
 from distutils.core import setup
-
+from setuptools import find_packages
 #This is a list of files to install, and where
 #(relative to the 'root' dir, where setup.py is)
 #You could be more specific.
@@ -18,6 +18,6 @@ setup(name = "eigprofuc",
     #(If you have other packages (dirs) or modules (py files) then
     #put them into the package directory - they will be found
     #recursively.)
-    packages = ['eigprofuc'],
+    packages = find_packages(),
     install_requires=['numpy>=1.15.4','scipy>=1.1.0','matplotlib>=2.2.2','nose2']
 )
